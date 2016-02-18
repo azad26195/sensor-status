@@ -48,5 +48,14 @@ public class Main{
 
 	    // Create a sink tap to write to the Hfs; by default, TextDelimited writes all fields out
 		Hfs outTap = new Hfs( new TextDelimited( true, "," ), outputPath, SinkMode.REPLACE );
+		
+		// Create a tuple of the input data
+		
+		Fields tupleField = new Fields("version", "sensorid", "serverts");
+		
+		FlowDef flowDef = FlowDef.flowDef().addSource(processPipe, inTap).addTailSink(groupByPipe,outTap);
+		Flow wcFlow = flowConnector.connect(flowDef);
+		wcFlow.complete();
+
     }
 } 
