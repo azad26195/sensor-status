@@ -1,0 +1,46 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'provided-base'
+
+archivesBaseName = 'sensor-status'
+
+ext.cascadingVersion = '3.0.0'
+ext.hadoopVersion = '2.7.0'
+
+buildscript {
+  repositories {
+    maven { url 'http://repo.spring.io/plugins-release' }
+  }
+  dependencies {
+    classpath 'com.netflix.nebula:gradle-extra-configurations-plugin:2.2.1'
+  }
+}
+
+repositories {
+  mavenCentral()
+  maven { url 'http://conjars.org/repo/' }
+}
+
+dependencies {
+  compile( group: 'cascading', name: 'cascading-core', version: cascadingVersion )
+  compile( group: 'cascading', name: 'cascading-local', version: cascadingVersion )
+  compile( group: 'cascading', name: 'cascading-hadoop2-mr1', version: cascadingVersion )
+
+  provided( group: 'org.apache.hadoop', name: 'hadoop-common', version: hadoopVersion )
+  provided( group: 'org.apache.hadoop', name: 'hadoop-mapreduce-client', version: hadoopVersion )
+  provided( group: 'org.apache.hadoop', name: 'hadoop-mapreduce-client-core', version: hadoopVersion )
+}
+
+jar {
+  description = "Assembles a Hadoop ready jar file"
+  doFirst {
+    into( 'lib' ) {
+      from { configurations.compile.minus( [configurations.provided] ) }
+    }
+  }
+
+  manifest {
+    attributes( "Main-Class": "status/Main" )
+  }
+}
