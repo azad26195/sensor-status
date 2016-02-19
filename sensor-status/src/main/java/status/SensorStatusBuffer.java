@@ -73,13 +73,13 @@ public class SensorStatusBuffer extends BaseOperation implements Buffer {
 		String startTimeString = "";
 		String currentTimeString = "";
 		String endTimeString = "";
-		Long timeStringDifference = "";
+		Long timeStringDifference = 0L;
 		Date endTime = new Date();
 		Date currentTime = new Date();
 		
 		Iterator<TupleEntry> arguments = bufferCall.getArgumentsIterator();
 		TupleEntry currentSensor = new TupleEntry();
-		ArrayList<SensorStatus> senorList = new ArrayList();
+		ArrayList<SensorStatus> sensorList = new ArrayList();
 		
 		currentSensor = arguments.next();
 		startTimeString = currentSensor.getString(2);

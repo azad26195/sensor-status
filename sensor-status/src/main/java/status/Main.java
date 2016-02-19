@@ -8,6 +8,7 @@ import cascading.operation.BaseOperation;
 import cascading.operation.Function;
 import cascading.operation.FunctionCall;
 import cascading.pipe.Each;
+import cascading.pipe.Every;
 import cascading.pipe.Pipe;
 import cascading.property.AppProps;
 import cascading.scheme.hadoop.TextDelimited;
@@ -56,12 +57,15 @@ public class Main{
 		Pipe groupByPipe = new Pipe("sc", processPipe);
 		groupByPipe = new GroupBy(groupByPipe, new Fields("sensorID"), new Fields("serverTS"));
 		
+		//Reduce job
+		Pipe statusPipe = new Every(groupByPipe, tupleField, new SensorStatusBuffer(), Fields.RESULTS);
+		
 
 
 			
 		FlowDef flowDef = FlowDef.flowDef()
 							.addSource(processPipe, inTap)
-							.addTailSink(groupByPipe,outTap);
+							.addTailSink(statusPipe,outTap);
 		Flow wcFlow = flowConnector.connect(flowDef);
 		wcFlow.complete();
 

@@ -26,6 +26,8 @@ dependencies {
   compile( group: 'cascading', name: 'cascading-core', version: cascadingVersion )
   compile( group: 'cascading', name: 'cascading-local', version: cascadingVersion )
   compile( group: 'cascading', name: 'cascading-hadoop2-mr1', version: cascadingVersion )
+  compile 'joda-time:joda-time:2.2'
+
 
   provided( group: 'org.apache.hadoop', name: 'hadoop-common', version: hadoopVersion )
   provided( group: 'org.apache.hadoop', name: 'hadoop-mapreduce-client', version: hadoopVersion )
