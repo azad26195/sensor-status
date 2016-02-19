@@ -29,45 +29,45 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 public class Main{
-  public static void main(String[] args){
-	  Properties properties = new Properties();
+	public static void main(String[] args){
+		Properties properties = new Properties();
 		AppProps.setApplicationJarClass( properties, Main.class );
 		Hadoop2MR1FlowConnector flowConnector = new Hadoop2MR1FlowConnector( properties );
 
 		AppProps.addApplicationTag( properties, "cluster:development" );
 		AppProps.setApplicationName( properties, "sensor-status-job" );
 
-	    // Input file
+		// Input file
 		String inputPath = args[ 0 ];
-	    // Output file
+		// Output file
 		String outputPath = args[ 1 ];
 
 		Hfs inTap = new Hfs( new TextLine(new Fields("offset", "line")), inputPath );
-	    // Create a sink tap to write to the Hfs; by default, TextDelimited writes all fields out
+		// Create a sink tap to write to the Hfs; by default, TextDelimited writes all fields out
 		Hfs outTap = new Hfs( new TextDelimited( true, "," ), outputPath, SinkMode.REPLACE );
-		
+
 		// Create a tuple of the input data
 		Fields tupleField = new Fields("version", "sensorID", "serverTS");
-		
+
 		//Splits the input data using seperator ,
 		Function splitter = new Splitter(tupleField);
 		Pipe processPipe = new Each("processPipe", new Fields("line"), splitter, tupleField);
-	
+
 		//Create a groupBy pipe for sorting the data according to the sensorid and timestamp
 		Pipe groupByPipe = new Pipe("sc", processPipe);
 		groupByPipe = new GroupBy(groupByPipe, new Fields("sensorID"), new Fields("serverTS"));
-		
+
 		//Reduce job
 		Pipe statusPipe = new Every(groupByPipe, tupleField, new SensorStatusBuffer(), Fields.RESULTS);
-		
 
 
-			
+
+
 		FlowDef flowDef = FlowDef.flowDef()
-							.addSource(processPipe, inTap)
-							.addTailSink(statusPipe,outTap);
+				.addSource(processPipe, inTap)
+				.addTailSink(statusPipe,outTap);
 		Flow wcFlow = flowConnector.connect(flowDef);
 		wcFlow.complete();
 
-    }
+	}
 } 
