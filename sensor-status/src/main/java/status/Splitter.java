@@ -29,7 +29,7 @@ public class Splitter extends BaseOperation implements Function{
 		result.add(tokens[0]);
 		result.add(tokens[1]);
 		result.add(tokens[2]);
-		 // return the result Tuple
+		// return the result Tuple
 		functionCall.getOutputCollector().add( result );
 	}
 	

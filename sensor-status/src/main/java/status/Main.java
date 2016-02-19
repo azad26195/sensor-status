@@ -56,7 +56,6 @@ public class Main{
 		Pipe groupByPipe = new Pipe("sc", processPipe);
 		groupByPipe = new GroupBy(groupByPipe, new Fields("sensorID"), new Fields("serverTS"));
 		
-		
 
 
 			
