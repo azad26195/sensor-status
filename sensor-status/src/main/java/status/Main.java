@@ -3,15 +3,10 @@ import cascading.flow.Flow;
 import cascading.flow.FlowDef;
 import cascading.flow.FlowProcess;
 import cascading.flow.hadoop2.Hadoop2MR1FlowConnector;
-import cascading.operation.AssertionLevel;
 import cascading.operation.BaseOperation;
 import cascading.operation.Function;
 import cascading.operation.FunctionCall;
-import cascading.operation.assertion.AssertExpression;
-import cascading.operation.regex.RegexParser;
-import cascading.operation.text.DateParser;
 import cascading.pipe.Each;
-import cascading.pipe.GroupBy;
 import cascading.pipe.Pipe;
 import cascading.property.AppProps;
 import cascading.scheme.hadoop.TextDelimited;
@@ -50,10 +45,17 @@ public class Main{
 		Hfs outTap = new Hfs( new TextDelimited( true, "," ), outputPath, SinkMode.REPLACE );
 		
 		// Create a tuple of the input data
-		
 		Fields tupleField = new Fields("version", "sensorid", "serverts");
 		
-		FlowDef flowDef = FlowDef.flowDef().addSource(processPipe, inTap).addTailSink(groupByPipe,outTap);
+		//Splits the input data using seperator ,
+		Function splitter = new Splitter(tupleField);
+		
+		Pipe processPipe = new Each("processPipe", new Fields("line"), splitter, tupleField);
+
+			
+		FlowDef flowDef = FlowDef.flowDef()
+							.addSource(processPipe, inTap)
+							.addTailSink(processPipe,outTap);
 		Flow wcFlow = flowConnector.connect(flowDef);
 		wcFlow.complete();
 
