@@ -35,8 +35,9 @@ import java.util.TimeZone;
 import java.util.Date;
 import java.util.*;
 import java.text.SimpleDateFormat;
-
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormat;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.DateTimeComparator;
@@ -44,7 +45,7 @@ import org.joda.time.DateTimeComparator;
 public class SensorStatusBuffer extends BaseOperation implements Buffer {
 
 	public SensorStatusBuffer() {
-		super( 1, new Fields("sensorid","range","status") );
+		super( 1, new Fields("SensorID", "TodaysDate","Range","Status") );
 	}
 
 	public SensorStatusBuffer( Fields fieldDeclaration ){
@@ -66,6 +67,13 @@ public class SensorStatusBuffer extends BaseOperation implements Buffer {
 	public String toHHMM(String timestampString){
 		DateTime date = toDateTime(timestampString.trim());
 		return date.hourOfDay().getAsText() + ":" + date.minuteOfHour().getAsText();    // return sdf.format(toDateString(timestampString.trim()));
+	}
+	
+	//Formate DateTime to DD/MM/YYYY
+	public String toDDMMYYY(String timestampstring){
+		DateTime date = toDateTime(timestampstring.trim());
+		DateTimeFormatter fmt = DateTimeFormat.forPattern("dd/MM/yyyy");
+		return fmt.print(date);	
 	}
 
 	//main Buffer operator function. 
@@ -93,8 +101,8 @@ public class SensorStatusBuffer extends BaseOperation implements Buffer {
 			timeStringDifference = endTime.getTime() - currentTime.getTime();
 
 			if(timeStringDifference > 3000*60){
-				sensorList.add(new SensorStatus(toHHMM(startTimeString), toHHMM(currentTimeString), "ON"));
-				sensorList.add(new SensorStatus(toHHMM(currentTimeString), toHHMM(endTimeString), "OFF"));
+				sensorList.add(new SensorStatus(toDDMMYYY(startTimeString), toHHMM(startTimeString), toHHMM(currentTimeString), "ON"));
+				sensorList.add(new SensorStatus(toDDMMYYY(currentTimeString), toHHMM(currentTimeString), toHHMM(endTimeString), "OFF"));
 				startTimeString = endTimeString;
 				currentTimeString = startTimeString;
 			}
@@ -103,12 +111,12 @@ public class SensorStatusBuffer extends BaseOperation implements Buffer {
 			}
 		}
 
-		sensorList.add(new SensorStatus(toHHMM(startTimeString), toHHMM(endTimeString), "ON"));
+		sensorList.add(new SensorStatus(toDDMMYYY(startTimeString), toHHMM(startTimeString), toHHMM(endTimeString), "ON"));
 		Iterator<SensorStatus> resultList = sensorList.iterator();
 
 		while(resultList.hasNext()){
 			SensorStatus results = resultList.next();
-			Tuple result = new Tuple(currentSensor.getString(1),results.from + "-" + results.to, results.status) ;
+			Tuple result = new Tuple(currentSensor.getString(1), results.today, results.from + "-" + results.to, results.status) ;
 			bufferCall.getOutputCollector().add(result);
 
 		}
