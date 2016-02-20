@@ -2,4 +2,4 @@
 .gradle/*
 .settings/*
 output/*
-
+*.sh
