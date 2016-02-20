@@ -1,8 +1,8 @@
 # Sensor Status
 > This is a mini project created as the part of my college assignment.
 
- ### Project Description:
- 
+ ## Project Description:
+
  > ##### Input
  We get the following tuple from Monitoring web:<br/>
 If the sensor is **UP**:<br/>
